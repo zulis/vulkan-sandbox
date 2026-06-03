@@ -1,0 +1,5 @@
+project(00-window LANGUAGES CXX)
+file(GLOB_RECURSE ALL_FILES ../shared/*.cpp ../shared/*.h *.cpp *.h)
+add_executable(${PROJECT_NAME} ${ALL_FILES})
+target_link_libraries(${PROJECT_NAME} PRIVATE library)
+set_target_properties(${PROJECT_NAME} PROPERTIES FOLDER "examples")

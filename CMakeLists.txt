@@ -29,7 +29,8 @@ set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -D_DEBUG")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -D_DEBUG")
 
 add_subdirectory(vendor)
-add_subdirectory(samples)
+add_subdirectory(library)
+add_subdirectory(examples)
 
 # Shader compilation (slangc → SPIR-V)
 include(cmake/shaders.cmake)
