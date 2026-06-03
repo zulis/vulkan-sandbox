@@ -39,6 +39,9 @@
 *.out
 *.app
 
+# Compiled shaders
+*.spv
+
 # Build directories
 build/
 Build/
@@ -67,3 +70,9 @@ vcpkg_installed/
 # test output & cache
 Testing/
 .cache/
+
+.vscode
+*.exe
+build
+bin
+*.spv
