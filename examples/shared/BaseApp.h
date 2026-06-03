@@ -2,6 +2,7 @@
 
 #include <imgui.h>
 #include <Window.h>
+#include <RendererVulkan.h>
 
 class BaseApp
 {
@@ -17,7 +18,8 @@ public:
     virtual void onResize(int width, int height) {}
     virtual void drawUI() = 0;
 
-    library::Window* window = nullptr;
+    library::Window*          window = nullptr;
+    library::RendererVulkan*  renderer = nullptr;
 
 private:
     bool m_running = false;

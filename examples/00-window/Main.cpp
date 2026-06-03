@@ -3,7 +3,7 @@
 using namespace library;
 
 // ---------------------------------------------------------------------------
-// App — thin layer over BaseApp; Window handles all Vulkan + SDL3
+// App — thin layer over BaseApp
 // ---------------------------------------------------------------------------
 class App : public BaseApp
 {
@@ -19,8 +19,15 @@ public:
 
     void draw() override
     {
-        // Window::beginFrame() already clears the screen.
-        // Add draw calls here once pipelines/geometry are set up.
+        // renderer->beginFrame() already clears the screen.
+        // Use renderer (RendererVulkan) to access Vulkan objects
+        // for pipeline creation, command recording, etc.
+        //
+        // Example:
+        //   VkCommandBuffer cmd = renderer->beginFrame(); // already called by BaseApp
+        //   VkDevice device = renderer->getDevice();
+        //   VkRenderPass rp = renderer->getRenderPass();
+        //   ... record draw commands ...
     }
 
     void drawUI() override
@@ -29,9 +36,10 @@ public:
 
     void onResize(int width, int height) override
     {
-        // Swapchain recreation is handled by Window::pollEvents()
         (void)width;
         (void)height;
+        // Swapchain recreation is handled by renderer->handleResize()
+        // which is called by BaseApp's resizeEvent callback.
     }
 };
 

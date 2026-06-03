@@ -9,13 +9,20 @@ BaseApp::BaseApp(const char* title)
     window = new Window();
     window->setTitle(title);
 
+    renderer = RendererVulkan::create(window);
+
     window->closeEvent = [this] { quit(); };
-    window->resizeEvent = [this](int w, int h) { onResize(w, h); };
+    window->resizeEvent = [this](int w, int h) {
+        onResize(w, h);
+        if (renderer) renderer->handleResize();
+    };
 }
 
 BaseApp::~BaseApp()
 {
+    delete renderer;
     delete window;
+    renderer = nullptr;
     window = nullptr;
 }
 
@@ -40,12 +47,12 @@ void BaseApp::run()
 
         update(deltaTime);
 
-        VkCommandBuffer cmd = window->beginFrame();
+        VkCommandBuffer cmd = renderer->beginFrame();
         if (cmd != VK_NULL_HANDLE)
         {
             draw();
             drawUI();
-            window->endFrame();
+            renderer->endFrame();
         }
     }
 }
