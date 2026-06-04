@@ -200,12 +200,14 @@ public:
     // -------------------------------------------------------------------
     // Accessors
     // -------------------------------------------------------------------
-    VkInstance       getInstance() const override       { return m_instance; }
-    VkPhysicalDevice getPhysicalDevice() const override { return m_physicalDevice; }
-    VkDevice         getDevice() const override         { return m_device; }
-    VkRenderPass     getRenderPass() const override     { return m_renderPass; }
-    VkExtent2D       getExtent() const override         { return m_swapchainExtent; }
-    VkFormat         getFormat() const override         { return m_swapchainFormat; }
+    VkInstance       getInstance() const override          { return m_instance; }
+    VkPhysicalDevice getPhysicalDevice() const override    { return m_physicalDevice; }
+    VkDevice         getDevice() const override            { return m_device; }
+    VkQueue          getGraphicsQueue() const override     { return m_graphicsQueue; }
+    uint32_t         getGraphicsQueueFamily() const override { return m_graphicsQueueFamily; }
+    VkRenderPass     getRenderPass() const override        { return m_renderPass; }
+    VkExtent2D       getExtent() const override            { return m_swapchainExtent; }
+    VkFormat         getFormat() const override            { return m_swapchainFormat; }
 
     // --- Called by Window on resize ---
     void handleResize() override
@@ -303,6 +305,7 @@ private:
         }
         volkLoadDevice(m_device);
 
+        m_graphicsQueueFamily = qf.graphics.value();
         vkGetDeviceQueue(m_device, qf.graphics.value(), 0, &m_graphicsQueue);
         vkGetDeviceQueue(m_device, qf.present.value(), 0, &m_presentQueue);
     }
@@ -532,6 +535,7 @@ private:
     VkDevice          m_device = VK_NULL_HANDLE;
     VkQueue           m_graphicsQueue = VK_NULL_HANDLE;
     VkQueue           m_presentQueue = VK_NULL_HANDLE;
+    uint32_t          m_graphicsQueueFamily = 0;
 
     VkSwapchainKHR    m_swapchain = VK_NULL_HANDLE;
     VkFormat          m_swapchainFormat = VK_FORMAT_UNDEFINED;

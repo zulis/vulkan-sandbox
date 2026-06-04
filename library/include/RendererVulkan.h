@@ -24,6 +24,8 @@ public:
     virtual VkInstance       getInstance() const = 0;
     virtual VkPhysicalDevice getPhysicalDevice() const = 0;
     virtual VkDevice         getDevice() const = 0;
+    virtual VkQueue          getGraphicsQueue() const = 0;
+    virtual uint32_t         getGraphicsQueueFamily() const = 0;
     virtual VkRenderPass     getRenderPass() const = 0;
     virtual VkExtent2D       getExtent() const = 0;
     virtual VkFormat         getFormat() const = 0;
