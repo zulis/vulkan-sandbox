@@ -104,6 +104,21 @@ public:
     // -------------------------------------------------------------------
     VkCommandBuffer beginFrame() override
     {
+        // Handle pending resize before acquiring
+        if (m_framebufferResized)
+        {
+            recreateSwapchain();
+            m_framebufferResized = false;
+        }
+
+        // Surface lost or swapchain invalid — wait for a valid resize event
+        if (m_surfaceLost || m_swapchain == VK_NULL_HANDLE)
+        {
+            // Still poll the fence so we don't deadlock if something was submitted
+            vkWaitForFences(m_device, 1, &m_inFlightFences[m_currentFrame], VK_TRUE, 0);
+            return VK_NULL_HANDLE;
+        }
+
         vkWaitForFences(m_device, 1, &m_inFlightFences[m_currentFrame], VK_TRUE, UINT64_MAX);
         vkResetFences(m_device, 1, &m_inFlightFences[m_currentFrame]);
 
@@ -114,6 +129,12 @@ public:
         if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR)
         {
             recreateSwapchain();
+            return VK_NULL_HANDLE;
+        }
+
+        if (result == VK_ERROR_SURFACE_LOST_KHR)
+        {
+            m_surfaceLost = true;
             return VK_NULL_HANDLE;
         }
 
@@ -170,6 +191,8 @@ public:
         VkResult result = vkQueuePresentKHR(m_presentQueue, &presentInfo);
         if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR)
             m_framebufferResized = true;
+        else if (result == VK_ERROR_SURFACE_LOST_KHR)
+            m_surfaceLost = true;
 
         m_currentFrame = (m_currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
     }
@@ -187,9 +210,7 @@ public:
     // --- Called by Window on resize ---
     void handleResize() override
     {
-        if (!m_framebufferResized) return;
-        recreateSwapchain();
-        m_framebufferResized = false;
+        m_framebufferResized = true;
     }
 
 private:
@@ -342,7 +363,13 @@ private:
             sci.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
         }
 
-        vkCreateSwapchainKHR(m_device, &sci, nullptr, &m_swapchain);
+        VkResult scResult = vkCreateSwapchainKHR(m_device, &sci, nullptr, &m_swapchain);
+        if (scResult != VK_SUCCESS || m_swapchain == VK_NULL_HANDLE)
+        {
+            std::cerr << "Failed to create swapchain: " << scResult << std::endl;
+            m_swapchain = VK_NULL_HANDLE;
+            return;
+        }
 
         uint32_t imgCount = 0;
         vkGetSwapchainImagesKHR(m_device, m_swapchain, &imgCount, nullptr);
@@ -443,6 +470,8 @@ private:
     {
         destroySwapchain();
         createSwapchain();
+        if (m_swapchain != VK_NULL_HANDLE)
+            m_surfaceLost = false;
     }
 
     // -------------------------------------------------------------------
@@ -521,6 +550,7 @@ private:
     int m_currentFrame = 0;
     uint32_t m_currentImageIndex = 0;
     bool m_framebufferResized = false;
+    bool m_surfaceLost = false;
 };
 
 // ===================================================================

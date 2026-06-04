@@ -64,12 +64,21 @@ bool Window::pollEvents()
         }
         if (event.type == SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED)
         {
-            if (resizeEvent)
+            int w, h;
+            SDL_GetWindowSizeInPixels(m_sdlWindow, &w, &h);
+
+            // Ignore spurious zero-size events (window minimized)
+            if (w == 0 || h == 0)
             {
-                int w, h;
-                SDL_GetWindowSizeInPixels(m_sdlWindow, &w, &h);
-                resizeEvent(w, h);
+                m_minimized = true;
+                continue;
             }
+            m_minimized = false;
+            m_width = w;
+            m_height = h;
+
+            if (resizeEvent)
+                resizeEvent(w, h);
         }
     }
 

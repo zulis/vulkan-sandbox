@@ -34,6 +34,7 @@ private:
     SDL_Window* m_sdlWindow = nullptr;
     int m_width = 1280;
     int m_height = 720;
+    bool m_minimized = false;
 };
 
 } // namespace library
