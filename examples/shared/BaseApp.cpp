@@ -16,6 +16,9 @@ BaseApp::BaseApp(const char* title)
         onResize(w, h);
         if (renderer) renderer->handleResize();
     };
+    window->eventCallback = [](const SDL_Event* e) {
+        ImGui_ImplSDL3_ProcessEvent(e);
+    };
 
     // --- Initialize ImGui ---
     IMGUI_CHECKVERSION();
